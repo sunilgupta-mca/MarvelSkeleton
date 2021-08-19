@@ -1,0 +1,4 @@
+protocol ProviderProtocol: AnyObject {
+    init()
+}
+

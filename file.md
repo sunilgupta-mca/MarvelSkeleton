@@ -1,4 +1,3 @@
-# MarvelSkeleton
 # Marvel Skeleton POC
 The purpose of this document is to explain the architecture of application.
 
