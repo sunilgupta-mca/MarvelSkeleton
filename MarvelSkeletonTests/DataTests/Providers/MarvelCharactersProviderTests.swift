@@ -34,7 +34,7 @@ class MarvelCharactersProviderTests: XCTestCase {
 
     func testGetMarvelCharactersListSuccess() {
         let success = expectation(description: "success")
-        marvelCharactersProvider().getMarvelCharactersList { (result) in
+        marvelCharactersProvider().getMarvelCharactersList(currentOffset: 0) { (result) in
             if case let .success(marvelCharactersListResponse) = result {
                 XCTAssertNotNil(marvelCharactersListResponse)
                 success.fulfill()
@@ -45,7 +45,7 @@ class MarvelCharactersProviderTests: XCTestCase {
 
     func testGetMarvelCharactersListEmptyResponse() {
         let empty = expectation(description: "empty")
-        marvelCharactersProvider(emptyResponse204).getMarvelCharactersList { result in
+        marvelCharactersProvider(emptyResponse204).getMarvelCharactersList(currentOffset: 0) { result in
                 if case .success = result {
                     empty.fulfill()
                 }
@@ -55,7 +55,7 @@ class MarvelCharactersProviderTests: XCTestCase {
 
     func testGetMarvelCharactersListTimeoutFailure() {
         let timeoutResponse = expectation(description: "timeoutResponse")
-        marvelCharactersProvider(timedOutResponse).getMarvelCharactersList { result in
+        marvelCharactersProvider(timedOutResponse).getMarvelCharactersList(currentOffset: 0) { result in
             if case let .failure(useCaseError) = result,
                case let .network(.noInternetConnection(underlyingError)) = useCaseError,
                case let MoyaError.underlying(error, _) = underlyingError {
@@ -70,7 +70,7 @@ class MarvelCharactersProviderTests: XCTestCase {
 
     func testGetMarvelCharactersListServerFailure() {
         let serverFailure = expectation(description: "serverFailure")
-        marvelCharactersProvider(errorResponse).getMarvelCharactersList { result in
+        marvelCharactersProvider(errorResponse).getMarvelCharactersList(currentOffset: 0) { result in
             if case let .failure(useCaseError) = result,
                case let .network(.noInternetConnection(underlyingError)) = useCaseError,
                case let MoyaError.underlying(_, response) = underlyingError {
@@ -83,7 +83,7 @@ class MarvelCharactersProviderTests: XCTestCase {
 
     func testGetMarvelCharactersListParseError() {
         let parseError = expectation(description: "parseError")
-        marvelCharactersProvider(emptyResponse).getMarvelCharactersList { result in
+        marvelCharactersProvider(emptyResponse).getMarvelCharactersList(currentOffset: 0) { result in
             if case .failure = result {
                 parseError.fulfill()
             }

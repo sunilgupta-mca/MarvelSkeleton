@@ -5,7 +5,7 @@ final class GetMarvelCharactersProviderMock: MarvelCharactersProviderProtocol {
     var result: Result<MarvelCharactersModel, UseCaseError>?
     var characterDetailResult: Result<MarvelCharacterDetailModel, UseCaseError>?
 
-    func getMarvelCharactersList(completion: @escaping GetMarvelCharactersListClosure) {
+    func getMarvelCharactersList(currentOffset: Int32, completion: @escaping GetMarvelCharactersListClosure) {
         guard let response = result else {
             return
         }

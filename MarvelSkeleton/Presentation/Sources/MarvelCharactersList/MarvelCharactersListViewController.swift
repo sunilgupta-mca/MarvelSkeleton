@@ -28,7 +28,7 @@ class MarvelCharactersListViewController: BaseViewController, MarvelCharactersLi
     }
 
     func changeViewState(_ state: MarvelCharactersListViewState) {
-        hideUIViews()
+        hideUIViews(state)
         switch state {
         case .clear:
             break
@@ -48,9 +48,9 @@ class MarvelCharactersListViewController: BaseViewController, MarvelCharactersLi
 }
 
 private extension MarvelCharactersListViewController {
-    func hideUIViews() {
+    func hideUIViews(_ state: MarvelCharactersListViewState) {
         loaderView.isHidden = true
-        tableView.isHidden = true
+        tableView.isHidden = state != .clear
         errorView.isHidden = true
     }
 
@@ -80,5 +80,14 @@ extension MarvelCharactersListViewController: UITableViewDataSource, UITableView
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         presenter.didTapOnTableRow(row: indexPath.row)
         tableView.deselectRow(at: indexPath, animated: false)
+    }
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let tableViewContentSizeHeight = tableView.contentSize.height
+        let tableViewHeight = tableView.frame.size.height
+        let currentTableViewHeight = tableViewContentSizeHeight - tableViewHeight
+        if (tableView.contentOffset.y >= currentTableViewHeight)  {
+            presenter.didTableViewScrolledToBottom()
+        }
     }
 }

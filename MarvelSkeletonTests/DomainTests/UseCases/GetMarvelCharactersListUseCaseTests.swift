@@ -13,13 +13,13 @@ class GetMarvelCharactersListUseCaseTests: XCTestCase {
     func testGetMarvelCharactersListSuccess() {
         let success = expectation(description: "success")
         mockMarvelCharactersListProvider.result = .success(getMarvelCharactersModel())
-
-        marvelCharactersListUseCase.execute { result in
+        let params = MarvelCharactersListParams(currentOffset: 0) { result in
             if case let .success(response) = result {
                 XCTAssertNotNil(response)
                 success.fulfill()
             }
         }
+        marvelCharactersListUseCase.execute(params)
         waitForExpectations(timeout: 1, handler: nil)
     }
 
@@ -27,11 +27,12 @@ class GetMarvelCharactersListUseCaseTests: XCTestCase {
         let serverError = expectation(description: "serverError")
         let error = NSError(domain: NSURLErrorDomain, code: 0, userInfo: nil)
         mockMarvelCharactersListProvider.result = .failure(.network(.general(error)))
-        marvelCharactersListUseCase.execute { result in
+        let params = MarvelCharactersListParams(currentOffset: 0) { result in
             if case .failure = result {
                 serverError.fulfill()
             }
         }
+        marvelCharactersListUseCase.execute(params)
         waitForExpectations(timeout: 1, handler: nil)
     }
 }

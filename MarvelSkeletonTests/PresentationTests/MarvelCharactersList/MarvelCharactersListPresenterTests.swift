@@ -98,6 +98,17 @@ class MarvelCharactersListPresenterTests: XCTestCase {
         //Then
         XCTAssertNil(model)
     }
+
+    func testDidTableViewScrolledToBottom() {
+        //Given
+        mockMarvelCharactersListUseCase.result = .success(getMarvelCharactersModel())
+
+        //When
+        presenter.didTableViewScrolledToBottom()
+
+        //Then
+        XCTAssertEqual(presenter.marvelCharactersModel.count, 1)
+    }
 }
 
 private extension MarvelCharactersListPresenterTests {

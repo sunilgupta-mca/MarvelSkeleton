@@ -16,9 +16,9 @@ final class MarvelCharactersProvider: MarvelCharactersProviderProtocol {
         self.marvelCharactersService = marvelCharactersService
     }
 
-    func getMarvelCharactersList(completion: @escaping GetMarvelCharactersListClosure) {
+    func getMarvelCharactersList(currentOffset: Int32, completion: @escaping GetMarvelCharactersListClosure) {
 
-        marvelCharactersService.request(.getCharactersList) { result in
+        marvelCharactersService.request(.getCharactersList(currentOffset: currentOffset)) { result in
             switch result {
             case .success(let response):
                 do {

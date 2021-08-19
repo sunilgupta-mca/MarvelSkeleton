@@ -2,7 +2,7 @@ import Foundation
 import Moya
 
 enum MarvelCharactersService {
-    case getCharactersList
+    case getCharactersList(currentOffset: Int32)
     case getCharactersDetails(characterId: Int32)
 }
 
@@ -43,10 +43,13 @@ extension MarvelCharactersService: BaseService {
     var task: Task {
         let timeStamp = "\(Date().timeIntervalSince1970)"
         let hash = (timeStamp + Marvel.privateKey + Marvel.publicKey).md5
-        let params = ["apikey": Marvel.publicKey, "ts": timeStamp, "hash": hash]
         switch self {
-        case .getCharactersList, .getCharactersDetails:
-            return .requestParameters(parameters: params, encoding: encoding)
+        case let .getCharactersList(offset):
+            return .requestParameters(parameters: ["apikey": Marvel.publicKey, "ts": timeStamp, "hash": hash, "offset": "\(offset)"],
+                                      encoding: encoding)
+        case .getCharactersDetails:
+            return .requestParameters(parameters: ["apikey": Marvel.publicKey, "ts": timeStamp, "hash": hash],
+                                      encoding: encoding)
         }
     }
 }

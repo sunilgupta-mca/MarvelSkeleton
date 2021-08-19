@@ -13,6 +13,7 @@ protocol MarvelCharactersListPresenterProtocol: PresenterProtocol {
     func didTapOnTableRow(row: Int)
     func numberOfRowsForTableView() -> Int
     func viewModelForRow(row: Int) -> MarvelCharactersViewModel?
+    func didTableViewScrolledToBottom()
 }
 
 final class MarvelCharactersListPresenter: MarvelCharactersListPresenterProtocol {
@@ -20,6 +21,9 @@ final class MarvelCharactersListPresenter: MarvelCharactersListPresenterProtocol
     weak var view: MarvelCharactersListView?
     var marvelCharactersFlowCoordinatorProtocol: MarvelCharactersFlowCoordinatorProtocol?
     var marvelCharactersModel = [MarvelCharactersResultsModel]()
+    private var isLoadingNextPage = false
+    private var isAllRecordFetched = false
+    private var currentOffset = 0
 
     private var viewState: MarvelCharactersListViewState = .clear {
         didSet {
@@ -63,15 +67,23 @@ final class MarvelCharactersListPresenter: MarvelCharactersListPresenterProtocol
         }
         return nil
     }
+
+    func didTableViewScrolledToBottom() {
+        if !isLoadingNextPage && !isAllRecordFetched {
+            fetchNewRecords()
+        }
+    }
 }
 
 private extension MarvelCharactersListPresenter {
     func fetchMarvelCharactersList() {
-        viewState = .showLoader
-        marvelCharactersUseCase.execute { [weak self] result in
+        viewState = currentOffset == 0 ? .showLoader : .clear
+        isLoadingNextPage = true
+        let param = MarvelCharactersListParams(currentOffset: Int32(currentOffset)) { [weak self] result in
             guard let self = self else {
                 return
             }
+            self.isLoadingNextPage = false
             switch result {
             case let .success(model):
                 self.responseReceived(model: model)
@@ -80,13 +92,21 @@ private extension MarvelCharactersListPresenter {
                 self.viewState = .showError
             }
         }
+        marvelCharactersUseCase.execute(param)
     }
 
     func responseReceived(model: MarvelCharactersModel) {
         guard let results = model.data?.results else {
             return
         }
-        marvelCharactersModel.removeAll()
+        currentOffset += results.count
+        let limit = model.data?.limit ?? 0
+        let count = model.data?.count ?? 0
+        isAllRecordFetched = count < limit
         marvelCharactersModel.append(contentsOf: results)
+    }
+
+    func fetchNewRecords() {
+        fetchMarvelCharactersList()
     }
 }
